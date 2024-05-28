@@ -126,7 +126,7 @@ void InserirJogo()
             {
                 Console.WriteLine("Time não encontrado na base da dados");
                 Console.WriteLine("Digite o ID do time da casa: ");
-                time_casa = int.Parse(Console.ReadLine());
+                time_casa = TryCatchInt();
             }
             Console.WriteLine("\n\n");
             Console.WriteLine(">>>>> Time visitante <<<<<");
@@ -137,11 +137,11 @@ void InserirJogo()
             {
                 Console.WriteLine("Time não encontrado na base da dados");
                 Console.WriteLine("Digite o ID do time visitante: ");
-                time_visitante = int.Parse(Console.ReadLine());
+                time_visitante = TryCatchInt();
             }
             while (time_casa == time_visitante)
             {
-                Console.WriteLine("Não é possivel digiar duas vezes o mesmo time por favor escolha outro time");
+                Console.WriteLine("Não é possivel digitar duas vezes o mesmo time por favor escolha outro time");
                 EquipePorID(time_casa);
                 Console.WriteLine("Digite o ID do time visitante: ");
                 time_visitante = int.Parse(Console.ReadLine());
@@ -198,7 +198,7 @@ void InserirEquipe()
     }
     catch (Exception e)
     {
-        Console.WriteLine("Erro ?");
+        Console.WriteLine("Dados digitado inválido, não foi possivel inserir o time na base de dados");
     }
     finally
     {
@@ -240,17 +240,17 @@ void MostrarJogos()
         try
         {
             var count = 1;
-            SqlCommand cmd = new SqlCommand("Select codigo,timeCasa,timeVisitante,golsCasa,golsVis,totalGols From Jogo", conexaosql);
+            SqlCommand cmd = new SqlCommand("[dbo].[MostrarJogos]", conexaosql);
             using (SqlDataReader reader = cmd.ExecuteReader())
                 while (reader.Read())
                 {
                     Console.WriteLine($">>>>>Jogo {count}<<<<<");
                     int id = int.Parse(reader["codigo"].ToString());
-                    int timeCasa = int.Parse(reader["timeCasa"].ToString());
-                    int timeVisitante = int.Parse(reader["timeVisitante"].ToString());
+                    string timeCasa = reader["TimeCasa"].ToString();
+                    string timeVisitante = reader["TimeVisitante"].ToString();
                     int golsCasa = int.Parse(reader["golsCasa"].ToString());
                     int golsVisitante = int.Parse(reader["golsVis"].ToString());
-                    Console.WriteLine($"codigo jogo: {id}\nTime da casa {timeCasa}\nTime visitante: {timeVisitante}\nQuantidade gols time da casa: {golsCasa}\nQuantidade gols time visitante: {golsVisitante}");
+                    Console.WriteLine($"codigo jogo: {id}\nTime da casa: {timeCasa}\nTime visitante: {timeVisitante}\nQuantidade gols time da casa: {golsCasa}\nQuantidade gols time visitante: {golsVisitante}");
                     Console.WriteLine("=================================");
                     count++;
                 }
@@ -433,7 +433,7 @@ void Menu()
     {
        while(VerificarQTDEquipe() < 3)
         {
-            Console.WriteLine($"Insira o {VerificarQTDEquipe()}° time");
+            Console.WriteLine($"Insira o {VerificarQTDEquipe() + 1}° time");
             InserirEquipe();
             Console.Clear();
         }
@@ -453,6 +453,9 @@ void Menu()
     Console.WriteLine("[0] - Sair");
     Console.WriteLine("Opção >>>> ");
     var op = TryCatchInt();
+        if (op < 0 || op > 12)
+            Console.WriteLine("Valor inválido ");
+        else
         switch (op)
         {
             case 0:
